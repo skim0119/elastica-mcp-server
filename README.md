@@ -14,10 +14,29 @@ A Python-based Model Context Protocol (MCP) server for controlling Elastica soft
 - Python 3.10+
 - PyElastica >= 0.3.3
 - MCP
+- uv (for source installation)
 
 ## Launching the server
 
 ```bash
+git clone https://github.com/skim0119/elastica-mcp-server.git
+uv sync
+elastica_mcp_server
+```
+
+```bash
 # uvx --from git+https://github.com/skim0119/elastica-mcp-server@main elastica_mcp_server  # not sure how to do this yet
-mcp run elastica_mcp_server
+```
+
+## mcp.json setup
+
+```json
+{
+    "mcpServers": {
+        "elastica-simulation-server": {
+            "command": "elastica_mcp_server",
+            "args": []
+        }
+    }
+}
 ```

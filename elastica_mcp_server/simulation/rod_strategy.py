@@ -1,7 +1,9 @@
 import numpy as np
+
 import elastica as ea
-from material import MaterialParams
 from pydantic import BaseModel
+
+from ..material import MaterialParams
 
 
 class StraightRodParams(BaseModel):

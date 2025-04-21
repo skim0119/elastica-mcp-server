@@ -2,6 +2,8 @@ from typing import Literal, TypeAlias, Any
 
 from pydantic import BaseModel
 
+from mcp.server.fastmcp import FastMCP
+
 AvailableMaterials: TypeAlias = Literal[
     "MuscleHydrostat", "SoftMaterial", "BoneMaterial"
 ]
@@ -32,3 +34,9 @@ def material_factory(material_name: AvailableMaterials) -> dict[str, Any]:
         }
     else:
         raise ValueError(f"Invalid material name: {material_name}")
+
+
+def register_material_tools(mcp: FastMCP):
+    @mcp.tool()  # type: ignore
+    def get_material(material_name: AvailableMaterials) -> MaterialParams:
+        return material_factory(material_name)

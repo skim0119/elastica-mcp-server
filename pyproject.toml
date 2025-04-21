@@ -9,14 +9,15 @@ dependencies = [
     "pyelastica",
 ]
 
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project.scripts]
 elastica_mcp_server = "elastica_mcp_server.server:main"
 
 [tool.uv.sources]
 pyelastica = { git = "https://github.com/GazzolaLab/PyElastica", branch = "update-0.3.3" }
-
-[tool.uv.workspace]
-members = ["elastica_mcp_server"]
 
 [dependency-groups]
 dev = [
