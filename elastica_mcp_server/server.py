@@ -4,13 +4,21 @@ from mcp.server.fastmcp import FastMCP
 
 from .material import register_material_tools
 from .simulation import register_simulation_tools
+from .instruction import instruction
 
 
 def instantiate_server() -> FastMCP:
-    mcp = FastMCP("elastica-mcp-simulator")
+    """
+    Instantiate the server with all the necessary tools.
+
+    Returns:
+        FastMCP: The instantiated server.
+    """
+    mcp = FastMCP("elastica-mcp-simulator", instruction=instruction)
 
     register_simulation_tools(mcp)
     register_material_tools(mcp)
+
     return mcp
 
 

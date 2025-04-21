@@ -97,7 +97,7 @@ def register_simulation_tools(mcp: FastMCP) -> None:
         }
 
     @mcp.tool()  # type: ignore
-    def get_current_position(simulator_tag: str, rod_tag: str) -> SystemResponse:
+    def get_current_position(simulator_tag: str, rod_tag: str) -> list[list[float]]:
         """
         Get the current position of the rod.
 
@@ -139,14 +139,32 @@ def register_simulation_tools(mcp: FastMCP) -> None:
 
     # Temporary tool
     @mcp.tool()  # type: ignore
-    def mimic_snake_motion(simulator_tag: str, rod_tag: str) -> None:
+    def apply_snake_boundary_conditions(
+        simulator_tag: str, rod_tag: str, rod_params: dict[str, Any]
+    ) -> SystemResponse:
         """
-        Mimic snake motion with the given parameters.
+        Setup boundary condition for snake motion. This should be used to set xy plane and friction condition.
+
+        Args:
+            simulator_tag: The tag of the simulator.
+            rod_tag: The tag of the rod.
+            rod_params: The parameters of the rod.
+                start_position: The starting position of the rod.
+                direction: The direction of the rod.
+                normal: The normal vector of the rod.
+                base_length: The length of the rod.
+                base_radius: The radius of the rod.
         """
-        manager[simulator_tag].mimic_snake_motion(rod_tag)
+        manager[simulator_tag].mimic_snake_motion(
+            rod_tag, StraightRodParams(**rod_params)
+        )
+        return {
+            "last_operation_message": f"Snake boundary condition applied with tag {rod_tag} on simulator {simulator_tag}.",
+            "last_operation_success": True,
+        }
 
     @mcp.tool()  # type: ignore
-    def get_velocity(simulator_tag: str, rod_tag: str) -> dict[str, float]:
+    def get_velocity(simulator_tag: str, rod_tag: str) -> dict[str, list[float]]:
         """
         Get the velocity of the rod.
 

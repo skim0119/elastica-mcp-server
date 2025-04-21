@@ -124,14 +124,14 @@ class SimulationInstance:
             phase_shift=0.0,
             rest_lengths=rod.rest_lengths,
             ramp_up_time=period,
-            direction=rod_params.normal,
+            direction=np.array(rod_params.normal, dtype=np.float64),
             with_spline=True,
         )
 
         # Add friction forces
         ground_plane = ea.Plane(
             plane_origin=np.array([0.0, -rod_params.base_radius, 0.0]),
-            plane_normal=rod_params.normal,
+            plane_normal=np.array(rod_params.normal, dtype=np.float64),
         )
         self.simulator.append(ground_plane)
         slip_velocity_tol = 1e-8
@@ -153,13 +153,13 @@ class SimulationInstance:
             kinetic_mu_array=kinetic_mu_array,
         )
 
-    def get_velocity(self, rod_tag: str) -> dict[str, float]:
+    def get_velocity(self, rod_tag: str) -> dict[str, list[float]]:
         data_dict = self.callbacks[rod_tag]
         period = 2
         _, _, avg_forward, avg_lateral = compute_projected_velocity(data_dict, period)
         return {
-            "average_forward_velocity": avg_forward,
-            "average_lateral_velocity": avg_lateral,
+            "average_forward_velocity": avg_forward.tolist(),
+            "average_lateral_velocity": avg_lateral.tolist(),
         }
 
 
@@ -186,8 +186,9 @@ class Manager:
         self.simulation_counter += 1
 
     def delete_simulation(self, simulator_tag: str) -> None:
-        del self.simulations[simulator_tag]
-        self.simulation_counter -= 1
+        if simulator_tag in self.simulations:
+            del self.simulations[simulator_tag]
+            self.simulation_counter -= 1
 
     def __getitem__(self, simulator_tag: str) -> SimulationInstance:
         return self.simulations[simulator_tag]
