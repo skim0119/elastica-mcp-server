@@ -30,7 +30,7 @@ def create_straight_rod(
     Create a straight Cosserat rod with specified parameters.
     """
 
-    shear_modulus = material.youngs_modulus / (2 * (1 + material.poisson_ratio))
+    shear_modulus = material.youngs_modulus / (1 + material.poisson_ratio)
 
     return ea.CosseratRod.straight_rod(
         rod_params.n_elem,

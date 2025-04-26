@@ -47,6 +47,10 @@ class SimulationInstance:
         self.rendering_fps = 60
         self.simulation_time = 0.0
 
+    @property
+    def step_skip(self) -> int:
+        return int(1.0 / (self.rendering_fps * self.time_step))
+
     @only_allow_once
     def finalize(self) -> None:
         self.simulator.finalize()
@@ -67,7 +71,6 @@ class SimulationInstance:
         )
 
         # Add damping
-        step_skip = int(1.0 / (self.rendering_fps * self.time_step))
         damping_constant = 2e-3
         self.simulator.dampen(rod).using(
             ea.AnalyticalLinearDamper,
@@ -78,7 +81,7 @@ class SimulationInstance:
         # Collect diagnostics
         pp_list: dict[str, list[Any]] = ea.defaultdict(list)
         self.simulator.collect_diagnostics(rod).using(
-            RodCallBack, step_skip=step_skip, callback_params=pp_list
+            RodCallBack, step_skip=self.step_skip, callback_params=pp_list
         )
         self.callbacks[rod_tag] = pp_list
 
@@ -107,13 +110,11 @@ class SimulationInstance:
     def mimic_snake_motion(self, rod_tag: str, rod_params: StraightRodParams) -> None:
         wave_length = 1.0
         period = 2
-        t_coeff_optimized = np.array(
-            [3.4e-3, 3.3e-3, 4.2e-3, 2.6e-3, 3.6e-3, 3.5e-3, 1.0],
+        b_coeff = np.array(
+            [3.4e-3, 3.3e-3, 4.2e-3, 2.6e-3, 3.6e-3, 3.5e-3, wave_length],
         )
-        b_coeff = np.hstack((t_coeff_optimized, wave_length))
 
         # Add muscle torques
-        wave_length = b_coeff[-1]
         rod = self.rods[rod_tag]
         self.simulator.add_forcing_to(rod).using(
             ea.MuscleTorques,
